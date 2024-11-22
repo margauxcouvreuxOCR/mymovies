@@ -1,12 +1,4 @@
-//
-//  SearchMovieView.swift
-//  MyMovies
-//
-//  Created by Margaux Mazaleyras on 22/11/2024.
-//
-
 import SwiftUI
-
 struct SearchMovieView: View {
     
     @ObservedObject var viewModel: ViewModel
@@ -31,7 +23,6 @@ struct SearchMovieView: View {
         viewModel = .init(tabMovies: movies)
     }
 }
-
 struct MovieListView: View {
     var movies: [Movie]
     
@@ -44,14 +35,11 @@ struct MovieListView: View {
         .listStyle(.plain)
     }
 }
-
 #Preview {
     NavigationStack {
         SearchMovieView(movies: [Movie.mock, Movie.mock, .mock])
     }
 }
-
-
 extension SearchMovieView {
     
     class ViewModel: ObservableObject {

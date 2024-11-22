@@ -1,6 +1,5 @@
 import SwiftUI
 import UIKit
-
 struct MovieDetailView: View {
     
     var movie : Movie
@@ -15,10 +14,9 @@ struct MovieDetailView: View {
         VStack {
             Text(movie.title)
                 .font(.largeTitle)
-            Text("Original title / language : \(movie.original_title) (\(movie.original_language))")
-            Text("Release date : \(formattedDate(from: movie.release_date))")
-            Text("Note: \(String(format: "%.1f", movie.voteAverage)) / 10 (\(movie.vote_count) votes)")
-
+            Text("Original title / language : \(movie.originalTitle) (\(movie.originalLanguage))")
+            Text("Release date : \(movie.releaseDate)")
+            Text("Note: \(String(format: "%.1f", movie.voteAverage)) / 10 (\(movie.voteCount) votes)")
             Text("Description : \(movie.overview)")
             if let image = viewModel.image {
                 Image(uiImage: image)
@@ -27,16 +25,13 @@ struct MovieDetailView: View {
                     .frame(maxWidth: 300, maxHeight: 300) // Limite la taille
                     .padding()
             }
-
         }
         .padding()
     }
 }
-
 #Preview {
     MovieDetailView(movie: Movie.mock)
 }
-
 extension MovieDetailView {
     
     class ViewModel: ObservableObject {
@@ -48,11 +43,11 @@ extension MovieDetailView {
         init(movie: Movie) {
             self.movie = movie
             Task {
-                self.image = await self.fetchImage(urlString: movie.poster_path ?? "https://www.animalwebaction.com/media/cache/5e/49/5e49848f06e5cdca18fb0acbbcc79720.png")
+//                let urlString = MovieAPI.shared.getImageUrl(urlImage: movie.posterPath)
+                self.image = await self.fetchImage(movie.posterURL)
             }
         }
-
-        func fetchImage(urlString: String) async -> UIImage? {
+        func fetchImage(_ urlString: String) async -> UIImage? {
             guard let url = URL(string: urlString) else { return nil }
             
             do {
@@ -64,10 +59,4 @@ extension MovieDetailView {
             }
         }
     }
-}
-
-func formattedDate(from date: Date) -> String {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "MMMM yyyy" // Format souhaité (ex: "November 2024")
-    return formatter.string(from: date)
 }

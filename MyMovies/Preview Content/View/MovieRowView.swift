@@ -1,18 +1,10 @@
-//
-//  MovieRowView.swift
-//  MyMovies
-//
-//  Created by Margaux Mazaleyras on 22/11/2024.
-//
-
 import SwiftUI
-
 struct MovieRowView: View {
     var movie: Movie
     
     var body: some View {
         HStack {
-            AsyncImage(url: URL(string: movie.poster_path ?? "https://www.animalwebaction.com/media/cache/5e/49/5e49848f06e5cdca18fb0acbbcc79720.png")) { image in
+            AsyncImage(url: URL(string: movie.posterURL)) { image in
                 image
                     .resizable()
                     .scaledToFit()
@@ -35,7 +27,6 @@ struct MovieRowView: View {
         
     }
 }
-
 #Preview() {
     MovieRowView(movie: Movie.mock)
 }
