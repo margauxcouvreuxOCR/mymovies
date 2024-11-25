@@ -4,6 +4,7 @@ struct MovieDetailView: View {
     
     var movie : Movie
     @ObservedObject var viewModel: ViewModel
+    @EnvironmentObject var favorites: FavoritesViewModel
     
     init(movie: Movie) {
         self.movie = movie
@@ -25,13 +26,28 @@ struct MovieDetailView: View {
                     .frame(maxWidth: 300, maxHeight: 300) // Limite la taille
                     .padding()
             }
+            Button(action: {
+                if favorites.isFavorite(movie) {
+                    favorites.remove(movie)
+                } else {
+                    favorites.add(movie)
+                }
+            }) {
+                Image(systemName: favorites.isFavorite(movie) ? "heart.fill" : "heart")
+                    .foregroundColor(.red)
+                    .font(.largeTitle)
+            }
+
+
         }
         .padding()
     }
 }
 #Preview {
     MovieDetailView(movie: Movie.mock)
+        .environmentObject(FavoritesViewModel()) // Ajout de l'EnvironmentObject ici
 }
+
 extension MovieDetailView {
     
     class ViewModel: ObservableObject {
