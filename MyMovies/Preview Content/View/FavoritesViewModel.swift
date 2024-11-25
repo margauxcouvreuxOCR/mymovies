@@ -8,7 +8,14 @@
 import Foundation
 
 class FavoritesViewModel: ObservableObject {
-    @Published var favoriteMovies: [Movie] = []
+    @Published var favoriteMovies: [Movie] = [] {
+        didSet {
+            saveFavorites()
+        }
+    }
+    
+    private let favoritesKey = "favoriteMovies"
+    
 
     func add(_ movie: Movie) {
         if !favoriteMovies.contains(where: { $0.id == movie.id }) {
@@ -26,4 +33,17 @@ class FavoritesViewModel: ObservableObject {
         }
         return favoriteMovies.contains(where: { $0.id == movie.id })
     }
+    
+    func saveFavorites() {
+            if let encoded = try? JSONEncoder().encode(favoriteMovies) {
+                UserDefaults.standard.set(encoded, forKey: favoritesKey)
+            }
+        }
+
+        func loadFavorites() {
+            if let data = UserDefaults.standard.data(forKey: favoritesKey),
+               let decoded = try? JSONDecoder().decode([Movie].self, from: data) {
+                favoriteMovies = decoded
+            }
+        }
 }

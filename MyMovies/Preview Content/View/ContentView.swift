@@ -27,6 +27,9 @@ struct ContentView: View {
                 Text("Favoris")
             }
         }
+        .onAppear {
+                    favorites.loadFavorites()
+                }
     }
 }
 
