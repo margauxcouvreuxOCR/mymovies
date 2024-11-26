@@ -1,23 +1,22 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject var favorites = FavoritesViewModel()
-
+    @ObservedObject var store = FavoritesStore.shared
+    
     var body: some View {
         TabView {
             NavigationStack {
                 SearchMovieView()
-                    .environmentObject(favorites) // Transmettre ici
             }
             .tabItem {
                 Image(systemName: "magnifyingglass")
                 Text("Rechercher")
             }
-
+            
             NavigationStack {
-                List(favorites.favoriteMovies, id: \.id) { movie in
-                    NavigationLink(destination: MovieDetailView(movie: movie).environmentObject(favorites)) {
-                        MovieRowView(movie: movie).environmentObject(favorites)
+                List(store.favoriteMovies, id: \.id) { movie in
+                    NavigationLink(destination: MovieDetailView(movie: movie)) {
+                        MovieRowView(movie: movie)
                     }
                 }
                 .navigationTitle("Favoris")
@@ -26,16 +25,24 @@ struct ContentView: View {
                 Image(systemName: "heart")
                 Text("Favoris")
             }
-        }
-        .onAppear {
-                    favorites.loadFavorites()
+            
+            NavigationStack {
+                List(store.watchlistMovies, id: \.id) { movie in
+                    NavigationLink(destination: MovieDetailView(movie: movie)) {
+                        MovieRowView(movie: movie)
+                    }
                 }
+                .navigationTitle("Watchlist")
+            }
+            .tabItem {
+                Image(systemName: "eye")
+                Text("Watchlist")
+            }
+        }
     }
 }
 
-
 #Preview {
     ContentView()
-        .environmentObject(FavoritesViewModel()) // Ajout de l'EnvironmentObject
 }
 

@@ -1,10 +1,11 @@
 import SwiftUI
 import UIKit
+
 struct MovieDetailView: View {
-    
-    var movie : Movie
+    var movie: Movie
     @ObservedObject var viewModel: ViewModel
-    @EnvironmentObject var favorites: FavoritesViewModel
+    @ObservedObject var favorites = FavoritesStore.shared
+    @ObservedObject var watchlist = FavoritesStore.shared
     
     init(movie: Movie) {
         self.movie = movie
@@ -19,6 +20,7 @@ struct MovieDetailView: View {
             Text("Release date : \(movie.releaseDate)")
             Text("Note: \(String(format: "%.1f", movie.voteAverage)) / 10 (\(movie.voteCount) votes)")
             Text("Description : \(movie.overview)")
+            
             if let image = viewModel.image {
                 Image(uiImage: image)
                     .resizable()
@@ -26,26 +28,39 @@ struct MovieDetailView: View {
                     .frame(maxWidth: 300, maxHeight: 300) // Limite la taille
                     .padding()
             }
+            
+            // Bouton pour ajouter/retirer des favoris
             Button(action: {
-                if favorites.isFavorite(movie) {
-                    favorites.remove(movie)
+                if favorites.contains(movie, in: favorites.favoriteMovies) {
+                    favorites.remove(movie, from: &favorites.favoriteMovies)
                 } else {
-                    favorites.add(movie)
+                    favorites.add(movie, to: &favorites.favoriteMovies)
                 }
             }) {
-                Image(systemName: favorites.isFavorite(movie) ? "heart.fill" : "heart")
+                Image(systemName: favorites.contains(movie, in: favorites.favoriteMovies) ? "heart.fill" : "heart")
                     .foregroundColor(.red)
                     .font(.largeTitle)
             }
-
-
+            
+            // Bouton pour ajouter/retirer de la watchlist
+            Button(action: {
+                if watchlist.contains(movie, in: watchlist.watchlistMovies) {
+                    watchlist.remove(movie, from: &watchlist.watchlistMovies)
+                } else {
+                    watchlist.add(movie, to: &watchlist.watchlistMovies)
+                }
+            }) {
+                Image(systemName: watchlist.contains(movie, in: watchlist.watchlistMovies) ? "eye.fill" : "eye")
+                    .foregroundColor(.blue)
+                    .font(.largeTitle)
+            }
         }
         .padding()
     }
 }
+
 #Preview {
-    MovieDetailView(movie: Movie.mock)
-        .environmentObject(FavoritesViewModel()) // Ajout de l'EnvironmentObject ici
+    MovieDetailView(movie: Movie.mock) // Ajout de l'EnvironmentObject ici
 }
 
 extension MovieDetailView {
@@ -59,10 +74,11 @@ extension MovieDetailView {
         init(movie: Movie) {
             self.movie = movie
             Task {
-//                let urlString = MovieAPI.shared.getImageUrl(urlImage: movie.posterPath)
-                self.image = await self.fetchImage(movie.posterURL)
+                let newImage = await self.fetchImage(movie.posterURL)
+                DispatchQueue.main.async { self.image = newImage }
             }
         }
+        
         func fetchImage(_ urlString: String) async -> UIImage? {
             guard let url = URL(string: urlString) else { return nil }
             

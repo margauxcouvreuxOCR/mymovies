@@ -2,17 +2,13 @@ import SwiftUI
 struct SearchMovieView: View {
     
     @ObservedObject var viewModel: ViewModel
-    @EnvironmentObject var favorites: FavoritesViewModel
-    func destination(movie: Movie) -> some View {
-        MovieDetailView(movie: movie).environmentObject(favorites)
-    }
     
     var body: some View {
         VStack {
             if viewModel.movies.isEmpty {
                 Text("No movie found").font(.headline).foregroundColor(.gray)
             } else {
-                MovieListView(movies: viewModel.movies).environmentObject(favorites)
+                MovieListView(movies: viewModel.movies)
             }
         }
         .navigationTitle("Search a movie")
@@ -30,13 +26,12 @@ struct SearchMovieView: View {
 
 struct MovieListView: View {
     var movies: [Movie]
-    @EnvironmentObject var favorites: FavoritesViewModel
+    
     
     var body: some View {
         
         List(movies, id: \.id) { movie in
-            NavigationLink(destination: MovieDetailView(movie: movie)
-                .environmentObject(favorites)) {
+            NavigationLink(destination: MovieDetailView(movie: movie)) {
                 MovieRowView(movie: movie)
             }
         }
